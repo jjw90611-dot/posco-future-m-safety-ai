@@ -1,7 +1,12 @@
+import os
 import openai
 import streamlit as st
 import json
 import time
+import httpx
+
+# 💡 핵심 해결책: 사내 주소로 통신할 때는 회사 프록시를 타지 않도록 강제 설정
+os.environ['NO_PROXY'] = 'aigpt.posco.net'
 
 def get_posco_client():
     """포스코 사내 API 가이드에 맞춘 클라이언트 생성"""
@@ -11,9 +16,18 @@ def get_posco_client():
     api_key = st.secrets["OPENAI_API_KEY"]
     
     try:
+        # 💡 프록시 무시 및 SSL 인증서 오류 무시, 타임아웃 여유있게 설정
+        custom_http_client = httpx.Client(
+            proxies=None, 
+            verify=False,  # 사내망 자체 인증서 오류 방지
+            timeout=60.0   # 응답 대기 시간 60초로 연장
+        )
+        
         client = openai.OpenAI(
             api_key=api_key, 
-            base_url="http://aigpt.posco.net/gpgpta01-gpt/v1"  # 사내 P-GPT 주소
+            base_url="http://aigpt.posco.net/gpgpta01-gpt/v1", # 만약 가이드에 https라면 https로 변경해주세요.
+            http_client=custom_http_client,
+            max_retries=2
         )
         return client
     except Exception as e:
@@ -27,13 +41,11 @@ def get_hazards_from_ai(task_info):
     if not client:
         st.warning("⚠️ API 키가 설정되지 않아 임시(Mock) 데이터를 보여드립니다.")
         time.sleep(1)
-        # 💡 임시 데이터도 최신 용어(떨어짐, 끼임)로 변경했습니다.
         return [
             {"위험분류": "떨어짐", "위험요인": "[임시] 비계 위 작업 중 발판 불량으로 인한 떨어짐", "현재_안전조치": "안전대 지급 및 체결"},
             {"위험분류": "끼임", "위험요인": "[임시] 크레인 하물과 구조물 사이에 끼임", "현재_안전조치": "신호수 배치 및 접근 통제"}
         ]
     
-    # 💡 AI에게 지시하는 프롬프트의 위험분류를 고용노동부 표준 용어로 변경했습니다.
     prompt = f"""
     당신은 포스코퓨처엠의 산업안전보건 전문가입니다. 
     다음 작업 정보를 바탕으로 발생 가능한 위험요인과 현재 필요한 안전조치를 도출해주세요.
@@ -55,7 +67,7 @@ def get_hazards_from_ai(task_info):
     
     try:
         response = client.chat.completions.create(
-            model="gpt-5.2", 
+            model="gpt-5.2", # 사내 가이드에 명시된 모델명 확인 필요
             messages=[
                 {"role": "system", "content": "You are a helpful safety expert. Output strictly in JSON."},
                 {"role": "user", "content": prompt}
@@ -101,7 +113,7 @@ def get_sif_analysis_from_ai(hazards):
     
     try:
         response = client.chat.completions.create(
-            model="gpt-5.2", 
+            model="gpt-5.2", # 사내 가이드에 명시된 모델명 확인 필요
             messages=[
                 {"role": "system", "content": "You are a helpful safety expert. Output strictly in JSON."},
                 {"role": "user", "content": prompt}
