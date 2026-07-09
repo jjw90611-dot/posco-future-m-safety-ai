@@ -1,99 +1,56 @@
-"""
-POSCO FUTURE M - AI 위험성평가 시스템
-메인 진입점
-"""
 import streamlit as st
-from pathlib import Path
 
-from src.utils.session import init_session_state
-from src.components.sidebar import render_sidebar
-from src.components.progress_bar import render_progress_bar, render_step_navigation
-
-
-# ==================== 페이지 설정 ====================
+# 페이지 기본 설정
 st.set_page_config(
-    page_title="POSCO FUTURE M - AI 위험성평가",
+    page_title="AI 위험성평가 시스템 | POSCO FUTURE M",
     page_icon="🛡️",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="expanded"
 )
 
-
-# ==================== CSS 로드 ====================
-def load_css():
-    """커스텀 CSS 로드"""
-    css_path = Path("assets/styles.css")
-    if css_path.exists():
-        with open(css_path, "r", encoding="utf-8") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-
-
-# ==================== 각 스텝 렌더링 (임시) ====================
-def render_step_1():
-    st.header("📝 Step 1: 작업 정보 입력")
-    st.info("👉 다음 스텝에서 실제 구현 예정입니다.")
-    st.markdown("""
-    **이 화면에서 할 일:**
-    - 작업명, 작업 설명 입력
-    - 부서, 장소, 인원, 일정 입력
-    - AI 분석 시작 트리거
-    """)
-
-
-def render_step_2():
-    st.header("🔍 Step 2: 위험요인 식별")
-    st.info("👉 다음에 구현 예정입니다.")
-
-
-def render_step_3():
-    st.header("📚 Step 3: SIF 사례 적용")
-    st.info("👉 다음에 구현 예정입니다.")
-
-
-def render_step_4():
-    st.header("📊 Step 4: 위험성평가서 작성")
-    st.info("👉 다음에 구현 예정입니다. (핵심 산출물)")
-
-
-def render_step_5():
-    st.header("🗣️ Step 5: TBM 카드 생성")
-    st.info("👉 다음에 구현 예정입니다.")
-
-
-STEP_RENDERERS = {
-    1: render_step_1,
-    2: render_step_2,
-    3: render_step_3,
-    4: render_step_4,
-    5: render_step_5,
-}
-
-
-def main():
-    init_session_state()
-    load_css()
-    render_sidebar()
-
-    st.markdown("""
-        <div style="margin-bottom: 20px;">
-            <h1 style="color: #0066CC; margin-bottom: 0;">
-                🛡️ AI 위험성평가 시스템
-            </h1>
-            <p style="color: #666; margin-top: 5px;">
-                작업 정보만 입력하면, AI가 위험요인부터 안전대책까지 자동 도출합니다
-            </p>
-        </div>
+# 폰트 및 글자 크기 변경 CSS 주입
+st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&display=swap');
+    
+    /* 전체 폰트 적용 및 기본 글자 크기 확대 */
+    * {
+        font-family: 'Nanum Gothic', sans-serif !important;
+    }
+    p, div, span, li, input, textarea, select {
+        font-size: 16px !important;
+    }
+    h1 { font-size: 2.5rem !important; }
+    h2 { font-size: 2.0rem !important; }
+    h3 { font-size: 1.5rem !important; }
+    </style>
     """, unsafe_allow_html=True)
 
-    render_progress_bar()
+# 사이드바 구성
+with st.sidebar:
+    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Posco_logo.svg/512px-Posco_logo.svg.png", width=150)
+    st.markdown("### AI 위험성평가 시스템")
+    st.divider()
+    
+    st.markdown("### 📋 메뉴")
+    st.button("🆕 새 평가서 작성", use_container_width=True)
+    st.button("📁 나의 평가서", use_container_width=True)
+    st.button("📊 대시보드", use_container_width=True)
+    
+    st.divider()
+    st.markdown("### ⚙️ 설정")
+    st.button("📖 사용 매뉴얼", use_container_width=True)
+    
+    # 연도 2026년으로 수정됨!
+    st.markdown("<br><br><br><br><br><p style='text-align: center; color: gray; font-size: 12px !important;'>© 2026 POSCO FUTURE M</p>", unsafe_allow_html=True)
 
-    current_step = st.session_state.current_step
-    renderer = STEP_RENDERERS.get(current_step)
-    if renderer:
-        renderer()
+# 메인 화면 타이틀
+st.title("🛡️ AI 위험성평가 시스템")
+st.markdown("작업 정보만 입력하면, AI가 위험요인부터 안전대책까지 자동 도출합니다.")
 
-    render_step_navigation()
+# 프로세스 바 (임시 텍스트)
+st.info("상단 프로세스 바 및 페이지 이동 기능은 다음 단계에서 연결됩니다.")
 
-
-if __name__ == "__main__":
-    main()
+# Step 1 화면 불러오기
+from pages import step1
+step1.render()
