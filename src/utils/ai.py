@@ -3,10 +3,10 @@ import openai
 import streamlit as st
 import json
 import time
-import httpx
 
-# 사내 주소로 통신할 때는 회사 프록시를 타지 않도록 강제 설정
+# 사내망(aigpt.posco.net) 접속 시 회사 외부망 프록시를 거치지 않도록 강제 설정
 os.environ['NO_PROXY'] = 'aigpt.posco.net'
+os.environ['no_proxy'] = 'aigpt.posco.net'
 
 def get_posco_client():
     """포스코 사내 API 가이드에 맞춘 클라이언트 생성"""
@@ -21,19 +21,10 @@ def get_posco_client():
         return None
     
     try:
-        # 사내망 통신을 위한 HTTP 클라이언트 설정
-        custom_http_client = httpx.Client(
-            trust_env=False,  # 시스템 프록시 환경변수 무시
-            verify=False,     # 사내망 자체 인증서 오류 방지
-            timeout=60.0      # 응답 대기 시간 60초로 연장
-        )
-        
-        # 💡 수정됨: http -> https 로 변경해 봅니다.
+        # 💡 가이드라인과 100% 동일한 설정 (http 사용, 기본 클라이언트)
         client = openai.OpenAI(
             api_key=api_key, 
-            base_url="https://aigpt.posco.net/gpgpta01-gpt/v1", 
-            http_client=custom_http_client,
-            max_retries=2
+            base_url="http://aigpt.posco.net/gpgpta01-gpt/v1"
         )
         return client
     except Exception as e:
@@ -72,8 +63,9 @@ def get_hazards_from_ai(task_info):
     """
     
     try:
+        # 💡 가이드라인에 명시된 gpt-5.2 모델 사용
         response = client.chat.completions.create(
-            model="gpt-5.2", # 사내 가이드에 명시된 모델명
+            model="gpt-5.2", 
             messages=[
                 {"role": "system", "content": "You are a helpful safety expert. Output strictly in JSON."},
                 {"role": "user", "content": prompt}
@@ -88,7 +80,6 @@ def get_hazards_from_ai(task_info):
         return result_json.get("hazards", [])
         
     except Exception as e:
-        # 💡 수정됨: 에러의 원인을 더 정확히 파악하기 위해 에러 메시지를 상세히 출력합니다.
         st.error(f"🚨 AI 분석 중 통신 오류가 발생했습니다.\n\n상세 에러 내용: {str(e)}")
         return []
 
@@ -119,8 +110,9 @@ def get_sif_analysis_from_ai(hazards):
     """
     
     try:
+        # 💡 가이드라인에 명시된 gpt-5.2 모델 사용
         response = client.chat.completions.create(
-            model="gpt-5.2", # 사내 가이드에 명시된 모델명
+            model="gpt-5.2", 
             messages=[
                 {"role": "system", "content": "You are a helpful safety expert. Output strictly in JSON."},
                 {"role": "user", "content": prompt}
