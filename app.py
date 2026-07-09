@@ -9,8 +9,9 @@ from src.utils.session import init_session_state
 from src.components.sidebar import render_sidebar
 from src.components.progress_bar import render_progress_bar, render_step_navigation
 
-# 새로 추가된 step1_input 모듈 임포트
+# 스텝 모듈 임포트
 from src.steps import step1_input
+from src.steps import step2_hazard
 
 # ==================== 페이지 설정 ====================
 st.set_page_config(
@@ -29,12 +30,6 @@ def load_css():
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ==================== 각 스텝 렌더링 (임시) ====================
-# step 1은 step1_input.py로 대체되었으므로 삭제됨
-
-def render_step_2():
-    st.header("🔍 Step 2: 위험요인 식별")
-    st.info("👉 Step 4에서 구현 예정입니다.")
-
 def render_step_3():
     st.header("📚 Step 3: SIF 사례 적용")
     st.info("👉 Step 5에서 구현 예정입니다.")
@@ -49,8 +44,8 @@ def render_step_5():
 
 # ==================== 메인 렌더링 로직 ====================
 STEP_RENDERERS = {
-    1: step1_input.render,  # step1_input.py의 render 함수 연결
-    2: render_step_2,
+    1: step1_input.render,
+    2: step2_hazard.render,  # step2_hazard.py 연결 완료
     3: render_step_3,
     4: render_step_4,
     5: render_step_5,
