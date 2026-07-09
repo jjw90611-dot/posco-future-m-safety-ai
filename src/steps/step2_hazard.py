@@ -41,7 +41,7 @@ def render():
             column_config={
                 "위험분류": st.column_config.SelectboxColumn(
                     "위험분류",
-                    options=["추락", "협착", "전도", "충돌", "화재", "폭발", "감전", "질식", "기타"],
+                    options=["떨어짐", "끼임", "넘어짐", "부딪힘", "화재", "폭발", "감전", "질식", "기타"],
                     required=True
                 ),
                 "위험요인": st.column_config.TextColumn("위험요인 (상세)", required=True),
