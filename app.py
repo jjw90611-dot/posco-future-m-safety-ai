@@ -9,6 +9,9 @@ from src.utils.session import init_session_state
 from src.components.sidebar import render_sidebar
 from src.components.progress_bar import render_progress_bar, render_step_navigation
 
+# 새로 추가된 step1_input 모듈 임포트
+from src.steps import step1_input
+
 # ==================== 페이지 설정 ====================
 st.set_page_config(
     page_title="POSCO FUTURE M - AI 위험성평가",
@@ -26,9 +29,7 @@ def load_css():
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # ==================== 각 스텝 렌더링 (임시) ====================
-def render_step_1():
-    st.header("📝 Step 1: 작업 정보 입력")
-    st.info("👉 다음 스텝에서 실제 구현 예정입니다.")
+# step 1은 step1_input.py로 대체되었으므로 삭제됨
 
 def render_step_2():
     st.header("🔍 Step 2: 위험요인 식별")
@@ -48,7 +49,7 @@ def render_step_5():
 
 # ==================== 메인 렌더링 로직 ====================
 STEP_RENDERERS = {
-    1: render_step_1,
+    1: step1_input.render,  # step1_input.py의 render 함수 연결
     2: render_step_2,
     3: render_step_3,
     4: render_step_4,
