@@ -1,0 +1,37 @@
+:root {
+    --primary-color: #0066CC;
+    --secondary-color: #00A170;
+    --danger-color: #E53935;
+    --warning-color: #FB8C00;
+    --bg-light: #F8F9FA;
+}
+
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    max-width: 1400px;
+}
+
+.stButton > button {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.stButton > button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 102, 204, 0.15);
+}
+
+.stButton > button[kind="primary"] {
+    background-color: #0066CC;
+    border-color: #0066CC;
+}
+
+[data-testid="stSidebar"] {
+    background-color: #FAFBFC;
+}
+
+h1, h2, h3 {
+    font-family: 'Noto Sans KR', sans-serif;
+}
