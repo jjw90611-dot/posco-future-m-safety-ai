@@ -11,7 +11,6 @@ os.environ['NO_PROXY'] = 'aigpt.posco.net'
 def get_posco_client():
     """포스코 사내 API 가이드에 맞춘 클라이언트 생성"""
     
-    # 1. 환경변수 또는 Streamlit secrets에서 PGPT_API_KEY 가져오기
     api_key = os.environ.get("PGPT_API_KEY")
     
     if not api_key and "PGPT_API_KEY" in st.secrets:
@@ -22,17 +21,17 @@ def get_posco_client():
         return None
     
     try:
-        # 2. 사내망 통신을 위한 HTTP 클라이언트 설정 (프록시 및 인증서 무시)
+        # 사내망 통신을 위한 HTTP 클라이언트 설정
         custom_http_client = httpx.Client(
             trust_env=False,  # 시스템 프록시 환경변수 무시
             verify=False,     # 사내망 자체 인증서 오류 방지
             timeout=60.0      # 응답 대기 시간 60초로 연장
         )
         
-        # 3. 포스코 사내 P-GPT API 주소로 OpenAI 클라이언트 연결
+        # 💡 수정됨: http -> https 로 변경해 봅니다.
         client = openai.OpenAI(
             api_key=api_key, 
-            base_url="http://aigpt.posco.net/gpgpta01-gpt/v1", 
+            base_url="https://aigpt.posco.net/gpgpta01-gpt/v1", 
             http_client=custom_http_client,
             max_retries=2
         )
@@ -89,7 +88,8 @@ def get_hazards_from_ai(task_info):
         return result_json.get("hazards", [])
         
     except Exception as e:
-        st.error(f"🚨 AI 분석 중 오류가 발생했습니다: {e}")
+        # 💡 수정됨: 에러의 원인을 더 정확히 파악하기 위해 에러 메시지를 상세히 출력합니다.
+        st.error(f"🚨 AI 분석 중 통신 오류가 발생했습니다.\n\n상세 에러 내용: {str(e)}")
         return []
 
 def get_sif_analysis_from_ai(hazards):
@@ -135,5 +135,5 @@ def get_sif_analysis_from_ai(hazards):
         return result_json.get("sif_analysis", [])
         
     except Exception as e:
-        st.error(f"🚨 SIF 분석 중 오류가 발생했습니다: {e}")
+        st.error(f"🚨 SIF 분석 중 통신 오류가 발생했습니다.\n\n상세 에러 내용: {str(e)}")
         return []
